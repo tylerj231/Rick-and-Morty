@@ -1,4 +1,5 @@
 import requests
+from django.db import IntegrityError
 
 from characters.models import Character
 from rick_and_morty_api import settings
@@ -26,7 +27,11 @@ def scrape_characters() -> list[Character]:
 
 def save_characters(characters: list[Character]):
     for character in characters:
-        character.save()
+        try:
+            character.save()
+        except IntegrityError:
+            print(f"Chracter with api_id {character.api_id} already exists in database.")
+
 
 def sync_characters_with_api() -> None:
     characters = scrape_characters()
